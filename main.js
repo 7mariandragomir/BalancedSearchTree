@@ -51,27 +51,48 @@ class Tree {
         } 
     }
 
-    _checkTreeRoot(node) {
-        if (node.parent === null) {
-            return true;
-        } else return false;
+    _deleteRootNode(node) {
+        if (node.left === null && node.right === null) {
+            this.root = null;
+        };
+
+        if (node.left !== null && node.right === null) {
+            this.root = node.left;
+        } else if (node.left === null && node.right !== null) {
+            this.root = node.right;
+        };
+
+        if (node.left !== null && node.right !== null) {
+            let targetNode = node.right; 
+
+            while (targetNode.left !== null) targetNode = targetNode.left;
+
+            targetNode.parent.left = targetNode.right;
+            targetNode.left = node.left;
+            targetNode.right = node.right;
+            this.root = targetNode;
+
+            node.left = null; node.right = null; targetNode.parent = null;
+        }
     }
 
     _deleteLeafNode(node, parent = node.parent) {
         if (parent.left === node) parent.left = null;
         if (parent.right === node) parent.right = null;
-        if (this._checkTreeRoot(node)) this.root = null;
     }
 
-    _deleteOneChildNode(node, hasLeftChild = true, parent = node.parent) {
+    _deleteOneChildNode(node, parent = node.parent) {
         if (node.left !== null && node.right === null) {
-            if (parent.left === node) parent.left = node.left;
+            if (parent.left === node) parent.left = node.left; 
             if (parent.right === node) parent.right = node.left;
+            return;
         } else if (node.left === null && node.right !== null) {
             if (parent.left === node) parent.left = node.right;
-            if (parent.right === node) parent.right = node.left;
+            if (parent.right === node) parent.right = node.right;
+            return;
         };
     }
+
 
     _deleteTwoChildNode(node) {
         let replacement = node.right; 
@@ -96,20 +117,26 @@ class Tree {
     }
 
     delete(data, root = this.root) {
+        if (root === null) return;
 
         if (data === root.data) {
             let parent;
-            if (root.parent !== null) parent = root.parent;
-
-            // dataNode is a leaf
-            if (root.left === null && root.right === null) this._deleteLeafNode(root);
-
-            // dataNode has one child
-            if (root.left === null || root.right === null) this._deleteOneChildNode(root);
-
-            // dataNode has two children
-            if (root.left !== null && root.right !== null) this._deleteTwoChildNode(root);
-
+            if (root.parent !== null) {
+                parent = root.parent;
+            } else {
+                this._deleteRootNode(root);
+                return;
+            }
+            if (root.left === null && root.right === null) {
+                this._deleteLeafNode(root);
+                return;
+            } else if (root.left === null || root.right === null) { 
+                this._deleteOneChildNode(root);
+                return;
+            } else if (root.left !== null && root.right !== null) {
+                this._deleteTwoChildNode(root);
+                return;
+            }
         };
         
         if (data < root.data && root.left !== null) {
