@@ -58,19 +58,41 @@ class Tree {
     }
 
     _deleteLeafNode(node, parent = node.parent) {
-        if (this._checkTreeRoot) this.root = null;
         if (parent.left === node) parent.left = null;
         if (parent.right === node) parent.right = null;
+        if (this._checkTreeRoot(node)) this.root = null;
     }
 
     _deleteOneChildNode(node, hasLeftChild = true, parent = node.parent) {
         if (node.left !== null && node.right === null) {
-            if (parent.left === root) parent.left = node.left;
-            if (parent.right === root) parent.right = node.left;
+            if (parent.left === node) parent.left = node.left;
+            if (parent.right === node) parent.right = node.left;
         } else if (node.left === null && node.right !== null) {
-            if (parent.left === root) parent.left = node.right;
-            if (parent.right === root) parent.right = node.left;
+            if (parent.left === node) parent.left = node.right;
+            if (parent.right === node) parent.right = node.left;
         };
+    }
+
+    _deleteTwoChildNode(node) {
+        let replacement = node.right; 
+
+        while (replacement.left !== null) {
+            replacement = replacement.left;
+        }; 
+
+        // replace the next biggest value with their right child; 
+        replacement.parent.left = replacement.right;
+        // put the replacement in the position of the node; 
+        if (this.root === node) {
+            this.root = replacement;
+        } else {
+            if (node.parent.left === node) node.parent.left = replacement;
+            if (node.parent.right === node) node.parent.right = replacement;
+        }
+        // assign node's children to the replacement; 
+        replacement.left = node.left; 
+        replacement.right = node.right;
+
     }
 
     delete(data, root = this.root) {
@@ -86,22 +108,7 @@ class Tree {
             if (root.left === null || root.right === null) this._deleteOneChildNode(root);
 
             // dataNode has two children
-            // if (root.left !== null && root.right !== null) {
-            //     let replacement = root.right;
-
-            //     while (replacement.left !== null) {
-            //         replacement = replacement.left
-            //     }; 
-
-            //     replacement.left = root.left;
-                
-            //     if (replacement.right !== null) {
-
-            //     } else replacement.right = root.right;
-
-            //     if (parent.left === root) parent.left = replacement;
-            //     if (parent.right === root) parent.right = replacement;
-            // };
+            if (root.left !== null && root.right !== null) this._deleteTwoChildNode(root);
 
         };
         
@@ -198,7 +205,8 @@ console.log(sortedTestArr);
 
 let t = new Tree(testArray);
 t.insert(400);
-// t.delete(67);
+prettyPrint(t.root);
+t.delete(8);
 prettyPrint(t.root);
 
 
