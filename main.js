@@ -104,15 +104,17 @@ class Tree {
         // replace the next biggest value with their right child; 
         replacement.parent.left = replacement.right;
         // put the replacement in the position of the node; 
-        if (this.root === node) {
-            this.root = replacement;
-        } else {
-            if (node.parent.left === node) node.parent.left = replacement;
-            if (node.parent.right === node) node.parent.right = replacement;
-        }
+        if (node.parent.left === node) node.parent.left = replacement;
+        if (node.parent.right === node) node.parent.right = replacement;
         // assign node's children to the replacement; 
-        replacement.left = node.left; 
-        replacement.right = node.right;
+        if (replacement === node.right) {
+            replacement.left = node.left;
+            replacement.parent = node.parent;
+        } else {
+            replacement.parent = node.parent;
+            replacement.left = node.left; 
+            replacement.right = node.right;
+        }
 
     }
 
